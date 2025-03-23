@@ -1,0 +1,11 @@
+<div class="sidebar">
+    <div *ngFor="let ai of availableAis" 
+         (click)="selectAi(ai)" 
+         class="sidebar-ai-item"
+         [class.active]="ai.id === selectedAiId">
+      <div class="ai-icon" [class.active]="ai.id === selectedAiId">
+        <img [src]="ai.icon" [alt]="ai.name">
+      </div>
+    </div>
+  </div>
+  

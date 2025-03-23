@@ -1,0 +1,61 @@
+.sidebar {
+    width: 80px;
+    height: 100vh;
+    background: linear-gradient(180deg, #2c3e50 0%, #1a2a38 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 0;
+    box-shadow: 5px 0 10px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+  }
+  
+  .sidebar-ai-item {
+    margin-bottom: 1.2rem;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .ai-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .ai-icon img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+  }
+  
+  .ai-icon:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+  }
+  
+  .ai-icon.active {
+    background: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .ai-icon.active::after {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 0 2px 2px 0;
+    clip-path: polygon(0 50%, 100% 0, 100% 100%);
+  }
+  
+  .sidebar-ai-item.active .ai-icon {
+    background: white;
+  }
