@@ -1,0 +1,40 @@
+<div class="chat-window">
+    <div class="chat-header">
+      <div class="chat-header-avatar">
+        {{ ai.name.charAt(0) }}
+      </div>
+      <div class="chat-header-info">
+        <h2>{{ ai.name }}</h2>
+        <p>{{ ai.description }}</p>
+      </div>
+    </div>
+    
+    <div class="messages-container">
+      <div *ngFor="let message of messages" 
+           class="message" 
+           [class.user]="message.sender === 'user'" 
+           [class.ai]="message.sender === 'ai'">
+        {{ message.text }}
+        <div class="message-time">{{ message.timestamp | date:'shortTime' }}</div>
+      </div>
+      
+      <div *ngIf="isTyping" class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+    
+    <div class="chat-input-container">
+      <input [(ngModel)]="newMessage" 
+             (keyup.enter)="sendMessage()" 
+             placeholder="Type a message to {{ ai.name }}..." 
+             class="chat-input">
+      <button (click)="sendMessage()" class="send-button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
