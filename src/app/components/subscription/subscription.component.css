@@ -1,0 +1,138 @@
+.subscription-banner {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 320px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    z-index: 100;
+    animation: slideIn 0.5s ease-out forwards;
+  }
+  
+  .subscription-content {
+    padding: 1.5rem;
+  }
+  
+  .banner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    color: #777;
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+  }
+  
+  .close-button:hover {
+    color: #333;
+  }
+  
+  .subscription-banner h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #3a7bd5, #00d2ff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .subscription-banner p {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+  
+  .feature-list {
+    list-style: none;
+    margin-bottom: 1.5rem;
+  }
+  
+  .feature-list li {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #444;
+    margin-bottom: 0.5rem;
+  }
+  
+  .feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+    color: white;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  .subscribe-button {
+    width: 100%;
+    padding: 0.8rem 1.2rem;
+    background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(58, 123, 213, 0.3);
+  }
+  
+  .subscribe-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(58, 123, 213, 0.4);
+  }
+  
+  .arrow-icon {
+    width: 16px;
+    height: 16px;
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+  }
+  
+  .subscribe-button:hover .arrow-icon {
+    transform: translateX(3px);
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+
+  @media (max-width: 768px) {
+    .subscription-banner {
+      position: relative;
+      top: auto;
+      right: auto;
+      width: calc(100% - 40px);
+      margin: 20px auto;
+    }
+  }

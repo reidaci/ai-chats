@@ -1,0 +1,22 @@
+<div class="subscription-banner" *ngIf="show">
+    <div class="subscription-content">
+      <div class="banner-header">
+        <h2>Premium AI Model</h2>
+        <button class="close-button" (click)="closeSubscription()">×</button>
+      </div>
+      <p>This AI model is available exclusively with our premium subscription.</p>
+      <ul class="feature-list">
+        <li><span class="feature-icon">✓</span> Access all AI assistants</li>
+        <li><span class="feature-icon">✓</span> Unlimited conversations</li>
+        <li><span class="feature-icon">✓</span> Priority response times</li>
+        <li><span class="feature-icon">✓</span> Advanced AI capabilities</li>
+      </ul>
+      <button class="subscribe-button" (click)="subscribe()">
+        Subscribe Now
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="arrow-icon">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
