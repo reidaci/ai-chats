@@ -1,0 +1,17 @@
+<div class="container">
+  <app-sidebar (aiSelected)="onAiSelected($event)" [selectedAiId]="selectedAi?.id"></app-sidebar>
+  
+  <div *ngIf="!selectedAi" class="welcome-screen">
+    <h1>Welcome to MultiChat AI</h1>
+    <p>Choose an AI assistant from the sidebar to start chatting</p>
+    <div class="ai-selection">
+
+      <div *ngFor="let ai of ais" (click)="onAiSelected(ai)" class="ai-icon">
+        <img [src]="ai.icon" [alt]="ai.name">
+      </div>
+    </div>
+  </div>
+  
+  <app-chat-window *ngIf="selectedAi" [ai]="selectedAi"></app-chat-window>
+  <app-subscription-banner *ngIf="selectedAi && !isPremiumUser" [show]="true"></app-subscription-banner>
+</div>
