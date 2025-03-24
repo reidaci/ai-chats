@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-subscription-plans',
   standalone: true,
-  imports: [],
+  imports: [ RouterModule],  
   templateUrl: './subscription-plans.component.html',
-  styleUrl: './subscription-plans.component.css'
+  styleUrls: ['./subscription-plans.component.css'] 
 })
 export class SubscriptionPlansComponent {
 

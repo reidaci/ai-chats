@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-subscription-banner',
@@ -9,6 +10,8 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./subscription.component.css']
 })
 export class SubscriptionComponent {
+constructor(private router:Router){}
+
   @Input() show: boolean = false;
   isVisible = true;
 
@@ -18,7 +21,7 @@ export class SubscriptionComponent {
 
   subscribe() {
 
-    console.log('User clicked subscribe');
+   this.router.navigate(['/subscription'])
  
   }
 }
