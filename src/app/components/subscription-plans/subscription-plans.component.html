@@ -1,1 +1,82 @@
-<p>subscription-plans works!</p>
+<div class="subscription-container">
+    <h1>Choose Your Premium Plan</h1>
+    
+    <div class="plan-selection">
+      <div class="plan-toggle">
+        <button [class.active]="selectedPlan === 'monthly'" (click)="selectPlan('monthly')">Monthly</button>
+        <button [class.active]="selectedPlan === 'annual'" (click)="selectPlan('annual')">Annual</button>
+      </div>
+      
+      <div class="plan-details">
+        <div class="plan-card" [class.selected]="selectedPlan === 'monthly'">
+          <h2>Monthly Plan</h2>
+          <div class="price">$9.99<span>/month</span></div>
+          <ul>
+            <li>Access all AI assistants</li>
+            <li>Unlimited conversations</li>
+            <li>Priority response times</li>
+            <li>Cancel anytime</li>
+          </ul>
+        </div>
+        
+        <div class="plan-card" [class.selected]="selectedPlan === 'annual'">
+          <h2>Annual Plan</h2>
+          <div class="price">$99.99<span>/year</span></div>
+          <div class="savings">Save 17%</div>
+          <ul>
+            <li>All monthly plan features</li>
+            <li>Advanced AI capabilities</li>
+            <li>Priority support</li>
+            <li>Early access to new models</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <div class="payment-section">
+      <h2>Payment Method</h2>
+      
+      <div class="payment-toggle">
+        <button [class.active]="paymentMethod === 'card'" (click)="selectPaymentMethod('card')">Credit Card</button>
+        <button [class.active]="paymentMethod === 'paypal'" (click)="selectPaymentMethod('paypal')">PayPal</button>
+      </div>
+      
+
+      <div class="payment-form" *ngIf="paymentMethod === 'card'">
+        <div class="form-group">
+          <label for="cardNumber">Card Number</label>
+          <input type="text" id="cardNumber" [(ngModel)]="cardDetails.number" placeholder="1234 5678 9012 3456">
+        </div>
+        
+        <div class="form-group">
+          <label for="cardName">Name on Card</label>
+          <input type="text" id="cardName" [(ngModel)]="cardDetails.name" placeholder="John Doe">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cardExpiry">Expiry Date</label>
+            <input type="text" id="cardExpiry" [(ngModel)]="cardDetails.expiry" placeholder="MM/YY">
+          </div>
+          
+          <div class="form-group">
+            <label for="cardCVV">Security Code</label>
+            <input type="text" id="cardCVV" [(ngModel)]="cardDetails.cvv" placeholder="123">
+          </div>
+        </div>
+      </div>
+      
+     
+      <div class="paypal-section" *ngIf="paymentMethod === 'paypal'">
+        <p>You will be redirected to PayPal to complete your purchase.</p>
+      </div>
+      
+      <button class="subscribe-button" (click)="processPayment()">
+        Complete Purchase
+      </button>
+      
+      <div class="security-note">
+        <small>🔒 Your payment information is secure and encrypted</small>
+      </div>
+    </div>
+  </div>
