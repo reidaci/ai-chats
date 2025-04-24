@@ -1,82 +1,150 @@
 <div class="subscription-container">
-    <h1>Choose Your Premium Plan</h1>
-    
-    <div class="plan-selection">
-      <div class="plan-toggle">
-        <button [class.active]="selectedPlan === 'monthly'" (click)="selectPlan('monthly')">Monthly</button>
-        <button [class.active]="selectedPlan === 'annual'" (click)="selectPlan('annual')">Annual</button>
-      </div>
-      
-      <div class="plan-details">
-        <div class="plan-card" [class.selected]="selectedPlan === 'monthly'">
-          <h2>Monthly Plan</h2>
-          <div class="price">$9.99<span>/month</span></div>
-          <ul>
-            <li>Access all AI assistants</li>
-            <li>Unlimited conversations</li>
-            <li>Priority response times</li>
-            <li>Cancel anytime</li>
-          </ul>
-        </div>
-        
-        <div class="plan-card" [class.selected]="selectedPlan === 'annual'">
-          <h2>Annual Plan</h2>
-          <div class="price">$99.99<span>/year</span></div>
-          <div class="savings">Save 17%</div>
-          <ul>
-            <li>All monthly plan features</li>
-            <li>Advanced AI capabilities</li>
-            <li>Priority support</li>
-            <li>Early access to new models</li>
-          </ul>
-        </div>
-      </div>
+  <div class="back-navigation">
+    <button class="back-button" (click)="navigateToHome()">
+        ← Back to Home
+    </button>
+  </div>
+
+  <h1>Choose Your Premium Plan</h1>
+  
+  <div class="plan-selection">
+    <div class="plan-toggle">
+      <button [class.active]="selectedPlan === 'monthly'" (click)="selectPlan('monthly')">Monthly</button>
+      <button [class.active]="selectedPlan === 'annual'" (click)="selectPlan('annual')">Annual</button>
     </div>
     
-    <div class="payment-section">
-      <h2>Payment Method</h2>
-      
-      <div class="payment-toggle">
-        <button [class.active]="paymentMethod === 'card'" (click)="selectPaymentMethod('card')">Credit Card</button>
-        <button [class.active]="paymentMethod === 'paypal'" (click)="selectPaymentMethod('paypal')">PayPal</button>
+    <div class="plan-details">
+      <div class="plan-card" [class.selected]="selectedPlan === 'monthly'">
+        <h2>Monthly Plan</h2>
+        <div class="price">$9.99<span>/month</span></div>
+        <ul>
+          <li>Access all AI assistants</li>
+          <li>Unlimited conversations</li>
+          <li>Priority response times</li>
+          <li>Cancel anytime</li>
+        </ul>
       </div>
       
-
-      <div class="payment-form" *ngIf="paymentMethod === 'card'">
+      <div class="plan-card" [class.selected]="selectedPlan === 'annual'">
+        <h2>Annual Plan</h2>
+        <div class="price">$99.99<span>/year</span></div>
+        <div class="savings">Save 17%</div>
+        <ul>
+          <li>All monthly plan features</li>
+          <li>Advanced AI capabilities</li>
+          <li>Priority support</li>
+          <li>Early access to new models</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  <div class="payment-section">
+    <h2>Payment Method</h2>
+    
+    <div class="payment-toggle">
+      <button [class.active]="paymentMethod === 'card'" (click)="selectPaymentMethod('card')">Credit Card</button>
+      <button [class.active]="paymentMethod === 'paypal'" (click)="selectPaymentMethod('paypal')">PayPal</button>
+    </div>
+    
+    <form [formGroup]="paymentForm" (ngSubmit)="processPayment()" *ngIf="paymentMethod === 'card'">
+      <div class="payment-form">
         <div class="form-group">
           <label for="cardNumber">Card Number</label>
-          <input type="text" id="cardNumber" [(ngModel)]="cardDetails.number" placeholder="1234 5678 9012 3456">
+          <input 
+            type="text" 
+            id="cardNumber" 
+            formControlName="cardNumber" 
+            placeholder="1234567890123456"
+            [ngClass]="{ 'is-invalid': submitted && f['cardNumber'].errors }"
+          >
+          <div *ngIf="submitted && f['cardNumber'].errors" class="error-message">
+            <div *ngIf="f['cardNumber'].errors?.['required']">Card number is required</div>
+            <div *ngIf="f['cardNumber'].errors?.['pattern']">Card number must be 16 digits</div>
+          </div>
         </div>
         
         <div class="form-group">
           <label for="cardName">Name on Card</label>
-          <input type="text" id="cardName" [(ngModel)]="cardDetails.name" placeholder="John Doe">
+          <input 
+            type="text" 
+            id="cardName" 
+            formControlName="cardName" 
+            placeholder="John Doe"
+            [ngClass]="{ 'is-invalid': submitted && f['cardName'].errors }"
+          >
+          <div *ngIf="submitted && f['cardName'].errors" class="error-message">
+            <div *ngIf="f['cardName'].errors?.['required']">Name is required</div>
+            <div *ngIf="f['cardName'].errors?.['minlength']">Name must be at least 3 characters</div>
+          </div>
         </div>
         
         <div class="form-row">
           <div class="form-group">
             <label for="cardExpiry">Expiry Date</label>
-            <input type="text" id="cardExpiry" [(ngModel)]="cardDetails.expiry" placeholder="MM/YY">
+            <input 
+              type="text" 
+              id="cardExpiry" 
+              formControlName="cardExpiry" 
+              placeholder="MM/YY"
+              [ngClass]="{ 'is-invalid': submitted && f['cardExpiry'].errors }"
+            >
+            <div *ngIf="submitted && f['cardExpiry'].errors" class="error-message">
+              <div *ngIf="f['cardExpiry'].errors?.['required']">Expiry date is required</div>
+              <div *ngIf="f['cardExpiry'].errors?.['pattern']">Format must be MM/YY</div>
+            </div>
           </div>
           
           <div class="form-group">
             <label for="cardCVV">Security Code</label>
-            <input type="text" id="cardCVV" [(ngModel)]="cardDetails.cvv" placeholder="123">
+            <input 
+              type="text" 
+              id="cardCVV" 
+              formControlName="cardCVV" 
+              placeholder="123"
+              [ngClass]="{ 'is-invalid': submitted && f['cardCVV'].errors }"
+            >
+            <div *ngIf="submitted && f['cardCVV'].errors" class="error-message">
+              <div *ngIf="f['cardCVV'].errors?.['required']">Security code is required</div>
+              <div *ngIf="f['cardCVV'].errors?.['pattern']">Must be 3 or 4 digits</div>
+            </div>
           </div>
         </div>
       </div>
       
-     
-      <div class="paypal-section" *ngIf="paymentMethod === 'paypal'">
-        <p>You will be redirected to PayPal to complete your purchase.</p>
-      </div>
-      
-      <button class="subscribe-button" (click)="processPayment()">
+      <button type="submit" class="subscribe-button">
         Complete Purchase
       </button>
-      
-      <div class="security-note">
-        <small>🔒 Your payment information is secure and encrypted</small>
+    </form>
+    
+    <div class="paypal-section" *ngIf="paymentMethod === 'paypal'">
+      <p>You will be redirected to PayPal to complete your purchase.</p>
+      <button class="subscribe-button" (click)="processPayment()">
+        Continue to PayPal
+      </button>
+    </div>
+    
+    <div class="security-note">
+      <small>🔒 Your payment information is secure and encrypted</small>
+    </div>
+  </div>
+
+
+  <div class="modal-backdrop" *ngIf="showSuccessModal">
+    <div class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Payment Successful!</h2>
+        </div>
+        <div class="modal-body">
+          <p>Thank you for your purchase. Your subscription has been activated.</p>
+          <p>You have selected the <strong>{{ selectedPlan }}</strong> plan.</p>
+          <p>You will receive a confirmation email shortly.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-button" (click)="closeModal()">Close</button>
+        </div>
       </div>
     </div>
   </div>
+</div>
