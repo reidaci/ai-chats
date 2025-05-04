@@ -1,11 +1,11 @@
-import { Component, Input, OnInit,OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 
 interface Message {
   text: string;
-  sender: 'user' | 'ai';
+  sender: 'user' | 'ai' | 'error';
   timestamp: Date;
 }
 
@@ -33,15 +33,14 @@ export class ChatWindowComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-   
     if (changes['ai'] && !changes['ai'].firstChange) {
-   
       this.clearChat();
     }
   }
 
   sendMessage() {
     if (this.newMessage.trim()) {
+
       this.messages.push({
         text: this.newMessage,
         sender: 'user',
@@ -55,25 +54,32 @@ export class ChatWindowComponent implements OnInit, OnChanges {
       this.apiService.sendMessage(userMessage, this.ai.endpoint).subscribe((response) => {
         this.isTyping = false;
   
+        if (response.isError) {
+          this.messages.push({
+            text: response.response,
+            sender: 'error',
+            timestamp: new Date()
+          });
+        } else {
+          this.messages.push({
+            text: response.response,
+            sender: 'ai',
+            timestamp: new Date()
+          });
+        }
   
-        let aiResponse: string;
-       
-        aiResponse = response.response;
-  
-        this.messages.push({
-          text: aiResponse,
-          sender: 'ai',
-          timestamp: new Date()
-        });
-  
-        setTimeout(() => {
-          const messageContainer = document.querySelector('.messages-container');
-          if (messageContainer) {
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-          }
-        }, 0);
+        this.scrollToBottom();
       });
     }
+  }
+
+  scrollToBottom() {
+    setTimeout(() => {
+      const messageContainer = document.querySelector('.messages-container');
+      if (messageContainer) {
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      }
+    }, 0);
   }
 
   clearChat() {
