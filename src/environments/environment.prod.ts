@@ -1,6 +1,6 @@
 export const environment = {
     production: true,
-    useMockData: true,
+    useMockData: false,
     openaiApiKey: '', 
     claudeApiKey: '',
     geminiApiKey: '',
