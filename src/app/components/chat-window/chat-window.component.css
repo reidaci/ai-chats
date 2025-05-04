@@ -78,9 +78,9 @@
   overflow-wrap: break-word;
   word-break: break-word;
   hyphens: auto;
- 
+
   min-width: 50px;
-  
+
   contain: content;
 }
 
@@ -107,7 +107,7 @@
   border-bottom-left-radius: 5px;
 
   max-width: 85%;
-  
+ 
   font-size: 14px;
   line-height: 1.4;
 }
@@ -126,7 +126,7 @@
 }
 
 .error-message-content span {
- 
+
   flex: 1;
 }
 
