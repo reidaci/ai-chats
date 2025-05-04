@@ -17,12 +17,12 @@
            'ai': message.sender === 'ai',
            'error': message.sender === 'error'
          }">
- 
+
       <ng-container *ngIf="message.sender !== 'error'">
         {{ message.text }}
       </ng-container>
       
-  
+    
       <ng-container *ngIf="message.sender === 'error'">
         <div class="error-message-content">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
