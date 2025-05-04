@@ -1,27 +1,86 @@
-# ChatsUi
+AI Chats
+A web application that allows users to chat with different AI models using their respective APIs.
+Features
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.8.
+Chat with multiple AI assistants including OpenAI (ChatGPT), Claude, Gemini, Llama, and Mistral
+Compare responses from different AI models
+Clean, intuitive user interface
+Save and export your conversations
 
-## Development server
+Prerequisites
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Node.js (v16 or higher)
+Angular CLI
+API keys for the AI services you want to use
 
-## Code scaffolding
+Installation
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Clone the repository:
+git clone https://github.com/reidaci/ai-chats.git
+cd ai-chats
 
-## Build
+Install dependencies:
+npm install
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Set up your API keys (see below)
+Start the development server:
+ng serve
 
-## Running unit tests
+Open your browser and navigate to http://localhost:4200
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Setting Up API Keys
+To use the AI services, you'll need to set up your API keys. These keys are not included in the repository for security reasons.
+Option 1: Update Environment Files Directly (Not Recommended for Production)
 
-## Running end-to-end tests
+Edit src/environments/environment.ts and src/environments/environment.prod.ts
+Add your API keys:
+typescriptexport const environment = {
+  production: false, // true in environment.prod.ts
+  useMockData: false,
+  openaiApiKey: 'your-openai-api-key-here',
+  claudeApiKey: 'your-claude-api-key-here',
+  geminiApiKey: 'your-gemini-api-key-here',
+  llamaApiKey: 'your-llama-api-key-here',
+  mistralApiKey: 'your-mistral-api-key-here'
+};
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
 
-## Further help
+Option 2: Create a Separate API Keys File (Recommended)
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Create a file named api-keys.ts in the src/app directory:
+typescriptexport const API_KEYS = {
+  openai: 'your-openai-api-key-here',
+  claude: 'your-claude-api-key-here',
+  gemini: 'your-gemini-api-key-here',
+  llama: 'your-llama-api-key-here',
+  mistral: 'your-mistral-api-key-here'
+};
+
+Make sure this file is listed in your .gitignore file to prevent accidental commits:
+# API Keys
+src/app/api-keys.ts
+
+Update the environment files to use the API keys from this file:
+typescriptimport { API_KEYS } from '../app/api-keys';
+
+export const environment = {
+  production: false, // true in environment.prod.ts
+  useMockData: false,
+  openaiApiKey: API_KEYS.openai,
+  claudeApiKey: API_KEYS.claude,
+  geminiApiKey: API_KEYS.gemini,
+  llamaApiKey: API_KEYS.llama,
+  mistralApiKey: API_KEYS.mistral
+};
+
+
+Where to Get API Keys
+
+OpenAI (ChatGPT): Sign up at OpenAI's platform and create an API key in the dashboard.
+Claude: Sign up for Claude's API access and get an API key.
+Gemini: Get an API key from Google AI Studio.
+Mistral: Create an account at Mistral AI to get your API key.
+Llama: Contact Meta AI or check their Llama documentation for API access.
+
+Mock Mode
+If you don't have API keys, you can enable mock mode by setting useMockData: true in the environment files. This will use simulated responses instead of making real API calls.
