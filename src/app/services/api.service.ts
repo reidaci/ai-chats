@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { catchError, delay, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
@@ -16,16 +16,17 @@ export class ApiService {
     }
   
     const apiEndpoint = this.getApiEndpoint(endpoint);
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.getApiKey(endpoint)}`
-    });
-    
-   
+    const headers = this.getApiHeaders(endpoint);
     const requestBody = this.prepareRequestBody(message, endpoint);
   
+   
+    let finalEndpoint = apiEndpoint;
+    if (endpoint === 'gemini' && this.getApiKey(endpoint)) {
+      finalEndpoint = `${apiEndpoint}?key=${this.getApiKey(endpoint)}`;
+    }
+
     return this.http.post(
-      apiEndpoint,
+      finalEndpoint,
       requestBody,
       { headers }
     ).pipe(
@@ -34,15 +35,95 @@ export class ApiService {
         return this.formatResponse(response, endpoint);
       }),
       catchError((error: HttpErrorResponse) => {
-      
-        const errorMessage = this.extractErrorMessage(error, endpoint);
+        
+        const errorResponse = this.extractErrorFromResponse(error);
         return of({ 
-          response: errorMessage, 
+          response: errorResponse, 
           ai: endpoint,
           isError: true 
         });
       })
     );
+  }
+
+  private extractErrorFromResponse(error: HttpErrorResponse): string {
+  
+    let errorMessage = error.statusText || 'Unknown error';
+    
+    try {
+     
+      if (error.error) {
+        if (typeof error.error === 'object') {
+       
+          if (error.error.error) {
+            if (typeof error.error.error === 'object' && error.error.error.message) {
+              errorMessage = error.error.error.message;
+            } else if (typeof error.error.error === 'string') {
+              errorMessage = error.error.error;
+            }
+          } else if (error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+        } else if (typeof error.error === 'string') {
+      
+          errorMessage = error.error;
+        }
+      }
+      
+    
+      return this.truncateMessage(errorMessage);
+    } catch (e) {
+    
+      return `Error ${error.status || ''}: Request failed`;
+    }
+  }
+  
+
+  private truncateMessage(message: string, maxLength: number = 100): string {
+    if (!message || message.length <= maxLength) return message;
+    
+
+    const nearPeriod = message.indexOf('.', maxLength/2);
+    if (nearPeriod > 0 && nearPeriod < maxLength) {
+      return message.substring(0, nearPeriod + 1);
+    }
+    
+
+    const nearSpace = message.lastIndexOf(' ', maxLength);
+    if (nearSpace > 0) {
+      return message.substring(0, nearSpace) + '...';
+    }
+    
+
+    return message.substring(0, maxLength) + '...';
+  }
+
+  private getApiHeaders(endpoint: string): HttpHeaders {
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    
+    const apiKey = this.getApiKey(endpoint);
+    if (apiKey) {
+      switch (endpoint) {
+        case 'openai':
+          headers = headers.set('Authorization', `Bearer ${apiKey}`);
+          break;
+        case 'claude':
+          headers = headers.set('x-api-key', apiKey)
+                          .set('anthropic-version', '2023-06-01');
+          break;
+        case 'mistral':
+          headers = headers.set('Authorization', `Bearer ${apiKey}`);
+          break;
+        default:
+          headers = headers.set('Authorization', `Bearer ${apiKey}`);
+      }
+    }
+    
+    return headers;
   }
 
   private prepareRequestBody(message: string, endpoint: string): any {
@@ -87,56 +168,28 @@ export class ApiService {
     
     switch (endpoint) {
       case 'openai':
-        formattedResponse = response.choices && response.choices[0]?.message?.content || 'No response content from OpenAI';
+        formattedResponse = response.choices && response.choices[0]?.message?.content || 'No response content';
         break;
       case 'claude':
-        formattedResponse = response.content && response.content[0]?.text || 'No response content from Claude';
+        formattedResponse = response.content && response.content[0]?.text || 'No response content';
         break;
       case 'gemini':
-        formattedResponse = response.candidates && response.candidates[0]?.content?.parts[0]?.text || 'No response content from Gemini';
+        formattedResponse = response.candidates && response.candidates[0]?.content?.parts[0]?.text || 'No response content';
         break;
       case 'llama':
-        formattedResponse = response.generation || response.text || 'No response content from Llama';
+        formattedResponse = response.generation || response.text || 'No response content';
         break;
       case 'mistral':
-        formattedResponse = response.choices && response.choices[0]?.message?.content || 'No response content from Mistral';
+        formattedResponse = response.choices && response.choices[0]?.message?.content || 'No response content';
         break;
       default:
-        formattedResponse = response.message || 'No response from AI service';
+        formattedResponse = response.message || 'No response from AI';
     }
     
     return {
       response: formattedResponse,
       ai: endpoint
     };
-  }
-
-  private extractErrorMessage(error: HttpErrorResponse, endpoint: string): string {
-    if (error.error && typeof error.error === 'object') {
-   
-      if (error.error.error) {
-       
-        if (typeof error.error.error === 'object' && error.error.error.message) {
-          return `Error from ${this.getAiName(endpoint)}: ${error.error.error.message}`;
-        } else if (typeof error.error.error === 'string') {
-          return `Error from ${this.getAiName(endpoint)}: ${error.error.error}`;
-        }
-      } else if (error.error.message) {
-   
-        return `Error from ${this.getAiName(endpoint)}: ${error.error.message}`;
-      }
-    }
-    
-
-    if (error.status === 401) {
-      return `Authentication failed for ${this.getAiName(endpoint)}. Your API key may be invalid or your usage plan may have exceeded its limit.`;
-    } else if (error.status === 429) {
-      return `Rate limit exceeded for ${this.getAiName(endpoint)}. Your usage plan limits have been reached.`;
-    } else if (error.status === 403) {
-      return `Access forbidden for ${this.getAiName(endpoint)}. Your account may not have permission to use this service.`;
-    }
-    
-    return `Error communicating with ${this.getAiName(endpoint)}: ${error.message || error.statusText || 'Unknown error'}`;
   }
 
   private getApiEndpoint(endpoint: string): string {
@@ -190,25 +243,25 @@ export class ApiService {
     }
   }
 
-  private getAiName(endpoint: string): string {
+  private getMockResponse(message: string, endpoint: string): Observable<any> {
+    let aiName = '';
     switch (endpoint) {
       case 'openai':
-        return 'ChatGPT';
+      aiName = 'ChatGPT';
+      break;
       case 'claude':
-        return 'Claude';
+        aiName = 'Claude';
+        break;
       case 'gemini':
-        return 'Gemini';
+        aiName = 'Gemini';
+        break;
       case 'llama':
-        return 'Llama';
+        aiName = 'Llama';
+        break;
       case 'mistral':
-        return 'Mistral';
-      default:
-        return 'AI';
+        aiName = 'Mistral';
+        break;
     }
-  }
-
-  private getMockResponse(message: string, endpoint: string): Observable<any> {
-    let aiName = this.getAiName(endpoint);
 
     const responses = [
       `Hello from ${aiName}! I received your message: "${message}"`,
