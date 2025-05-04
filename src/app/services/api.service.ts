@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError, delay, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
@@ -20,37 +20,123 @@ export class ApiService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${this.getApiKey(endpoint)}`
     });
+    
+   
+    const requestBody = this.prepareRequestBody(message, endpoint);
   
-  
-    if (endpoint === 'openai') {
-      return this.http.post(
-        'https://api.openai.com/v1/chat/completions',
-        {
+    return this.http.post(
+      apiEndpoint,
+      requestBody,
+      { headers }
+    ).pipe(
+      map(response => {
+        
+        return this.formatResponse(response, endpoint);
+      }),
+      catchError((error: HttpErrorResponse) => {
+      
+        const errorMessage = this.extractErrorMessage(error, endpoint);
+        return of({ 
+          response: errorMessage, 
+          ai: endpoint,
+          isError: true 
+        });
+      })
+    );
+  }
+
+  private prepareRequestBody(message: string, endpoint: string): any {
+    switch (endpoint) {
+      case 'openai':
+        return {
           messages: [{ role: 'user', content: message }],
           model: 'gpt-3.5-turbo',
           max_tokens: 500
-        },
-        { headers }
-      ).pipe(
-      
-        map(response => ({
-          response: response || 'No response from OpenAI',
-          ai: endpoint
-        }))
-      );
+        };
+      case 'claude':
+        return {
+          model: this.getModelName(endpoint),
+          messages: [{ role: 'user', content: message }],
+          max_tokens: 500
+        };
+      case 'gemini':
+        return {
+          contents: [{ role: 'user', parts: [{ text: message }] }],
+          generationConfig: {
+            maxOutputTokens: 500
+          }
+        };
+      case 'llama':
+        return {
+          prompt: message,
+          model: this.getModelName(endpoint),
+          max_tokens: 500
+        };
+      case 'mistral':
+        return {
+          messages: [{ role: 'user', content: message }],
+          model: this.getModelName(endpoint)
+        };
+      default:
+        return { message };
     }
+  }
+
+  private formatResponse(response: any, endpoint: string): any {
+    let formattedResponse;
+    
+    switch (endpoint) {
+      case 'openai':
+        formattedResponse = response.choices && response.choices[0]?.message?.content || 'No response content from OpenAI';
+        break;
+      case 'claude':
+        formattedResponse = response.content && response.content[0]?.text || 'No response content from Claude';
+        break;
+      case 'gemini':
+        formattedResponse = response.candidates && response.candidates[0]?.content?.parts[0]?.text || 'No response content from Gemini';
+        break;
+      case 'llama':
+        formattedResponse = response.generation || response.text || 'No response content from Llama';
+        break;
+      case 'mistral':
+        formattedResponse = response.choices && response.choices[0]?.message?.content || 'No response content from Mistral';
+        break;
+      default:
+        formattedResponse = response.message || 'No response from AI service';
+    }
+    
+    return {
+      response: formattedResponse,
+      ai: endpoint
+    };
+  }
+
+  private extractErrorMessage(error: HttpErrorResponse, endpoint: string): string {
+    if (error.error && typeof error.error === 'object') {
    
-    return this.http.post(
-      apiEndpoint,
-  
-      { headers }
-    ).pipe(
-      catchError(error => {
-      
-      
-        return of({ response: `Sorry, there was an error communicating with server. Please try again.` });
-      })
-    );
+      if (error.error.error) {
+       
+        if (typeof error.error.error === 'object' && error.error.error.message) {
+          return `Error from ${this.getAiName(endpoint)}: ${error.error.error.message}`;
+        } else if (typeof error.error.error === 'string') {
+          return `Error from ${this.getAiName(endpoint)}: ${error.error.error}`;
+        }
+      } else if (error.error.message) {
+   
+        return `Error from ${this.getAiName(endpoint)}: ${error.error.message}`;
+      }
+    }
+    
+
+    if (error.status === 401) {
+      return `Authentication failed for ${this.getAiName(endpoint)}. Your API key may be invalid or your usage plan may have exceeded its limit.`;
+    } else if (error.status === 429) {
+      return `Rate limit exceeded for ${this.getAiName(endpoint)}. Your usage plan limits have been reached.`;
+    } else if (error.status === 403) {
+      return `Access forbidden for ${this.getAiName(endpoint)}. Your account may not have permission to use this service.`;
+    }
+    
+    return `Error communicating with ${this.getAiName(endpoint)}: ${error.message || error.statusText || 'Unknown error'}`;
   }
 
   private getApiEndpoint(endpoint: string): string {
@@ -92,7 +178,7 @@ export class ApiService {
       case 'openai':
         return 'gpt-3.5-turbo';
       case 'claude':
-        return 'claude-instant-1.1';
+        return 'claude-3-haiku-20240307';
       case 'gemini':
         return 'gemini-pro';
       case 'llama':
@@ -104,25 +190,25 @@ export class ApiService {
     }
   }
 
-  private getMockResponse(message: string, endpoint: string): Observable<any> {
-    let aiName = 'AI';
+  private getAiName(endpoint: string): string {
     switch (endpoint) {
       case 'openai':
-      aiName = 'ChatGPT';
-      break;
+        return 'ChatGPT';
       case 'claude':
-        aiName = 'Claude';
-        break;
+        return 'Claude';
       case 'gemini':
-        aiName = 'Gemini';
-        break;
+        return 'Gemini';
       case 'llama':
-        aiName = 'Llama';
-        break;
+        return 'Llama';
       case 'mistral':
-        aiName = 'Mistral';
-        break;
+        return 'Mistral';
+      default:
+        return 'AI';
     }
+  }
+
+  private getMockResponse(message: string, endpoint: string): Observable<any> {
+    let aiName = this.getAiName(endpoint);
 
     const responses = [
       `Hello from ${aiName}! I received your message: "${message}"`,
