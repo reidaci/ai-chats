@@ -1,6 +1,7 @@
 # AI Chats
 
 A web application that allows users to chat with different AI models using their respective APIs.
+https://ai-chats-free.netlify.app/
 
 ## Features
 
